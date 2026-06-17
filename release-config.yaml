@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Release configuration — Ethiopia Base IG (ETBase)
+# Releasing the local IG at  C:/work/ImplementationGuides/Ethiopia-ETBase
+#   package-id : et.fhir.core
+#   canonical  : http://fhir.et/core
+#   publish at : http://fhir.et/core/0.9.0   (per publication-request.json)
+# ─────────────────────────────────────────────────────────────────────────
+
+# Source IG (local build target — the publisher builds in place here)
+source_dir: C:/work/ImplementationGuides/Ethiopia-ETBase
+# Alternative: clone the IG from GitHub instead of using the local folder
+#source_repo: https://github.com/costateixeira/ETBase-1
+#source_branch: main
+
+# Webroot (smart-html) settings
+# NOTE: this webroot must contain a publish-setup.json whose layout-rules match
+# the ET package/canonical (see release/webroot/publish-setup.json).
+webroot_repo: https://github.com/costateixeira/smart-html
+webroot_branch: main
+webroot_pr_target_branch: main
+
+# History template settings
+history_repo: https://github.com/HL7/fhir-ig-history-template
+history_branch: master
+
+# Registry settings
+registry_pr_target_branch: master
+
+# Sparse checkout — DISABLED for this IG.
+# The webroot is small (landing page + a single IG folder), so a full clone is
+# cheap and avoids edge cases in the slug auto-detect. The publish-setup.json
+# layout-rule maps et.fhir.* -> /{3}, i.e. package et.fhir.core publishes to /core.
+enable_sparse_checkout: false
+#sparse_dirs:
+#  - /templates
+#  - /assets
+
+# GitHub settings
+enable_pr_creation: false   # local run; set true + token to open webroot/registry PRs
+github_token: ''            # leave empty for local, or add a PAT
+
+# Publishing settings
+# NOTE: publish_to_gh_pages is only honored via the --publish-gh-pages CLI flag
+# (main() does not read this key), and the gh-pages step needs bash+rsync (CI/Linux),
+# so it is off for a local Windows run.
+publish_to_gh_pages: false
+sitepreview_dir: sitepreview
+gh_pages_branch: gh-pages
+exclude_paths:
+  - ig-build-zips/

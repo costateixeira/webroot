@@ -1,0 +1,15 @@
+{
+  "website" : {
+    "style" : "fhir.layout",
+    "url" : "http://fhir.et",
+    "server" : "apache",
+    "org" : "Ethiopia MoH",
+    "index-template":"index.template",
+    "clone-xml-json" : true
+  },
+  "layout-rules" : [{
+    "npm" : "et.fhir.*",
+    "canonical" : "http://fhir.et/{3}",
+    "destination" : "/{3}"
+  }]
+}

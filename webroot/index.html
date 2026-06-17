@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethiopia FHIR Implementation Guides</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.11.5/datatables.min.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.11.5/datatables.min.js"></script>
+    <style>
+        :root {
+            --et-primary: #1c7a8c;     /* teal */
+            --et-primary-dark: #155a6b;
+            --et-accent: #f2c200;      /* yellow */
+            --et-ink: #1f2933;
+            --et-muted: #677685;
+            --et-bg: #eef2f5;
+            --et-card: #ffffff;
+            --et-border: #e3e9ee;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--et-bg);
+            color: var(--et-ink);
+            margin: 0;
+        }
+        .page { max-width: 1200px; margin: 0 auto; padding: 24px 20px 64px; }
+
+        /* ── Header ── */
+        .masthead {
+            background: var(--et-card);
+            border: 1px solid var(--et-border);
+            border-radius: 18px;
+            padding: 28px 32px;
+            box-shadow: 0 8px 28px rgba(21, 90, 107, 0.08);
+        }
+        .masthead-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .masthead-top img { display: block; }
+        .masthead h1 { font-size: 1.9rem; font-weight: 700; margin: 18px 0 6px; }
+        .masthead p.lead { color: var(--et-muted); margin: 0; max-width: 720px; }
+        .masthead .accent-rule {
+            height: 5px; width: 100%; margin-top: 22px; border-radius: 4px;
+            background: linear-gradient(90deg, #1c7a8c 0%, #1c7a8c 33%, var(--et-accent) 33%, var(--et-accent) 66%, #d4351c 66%, #d4351c 100%);
+            opacity: .85;
+        }
+
+        /* ── Tabs ── */
+        .tabbar { display: flex; gap: 8px; margin: 28px 0 18px; }
+        .tabbar button {
+            border: 1px solid var(--et-border);
+            background: var(--et-card);
+            color: var(--et-muted);
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+        .tabbar button:hover { color: var(--et-primary-dark); border-color: var(--et-primary); }
+        .tabbar button.active {
+            background: var(--et-primary); border-color: var(--et-primary); color: #fff;
+            box-shadow: 0 4px 14px rgba(28, 122, 140, .35);
+        }
+        .status { color: var(--et-muted); font-size: .95rem; margin: 4px 2px 18px; }
+
+        /* ── IG cards ── */
+        .ig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; }
+        .ig-card {
+            position: relative;
+            background: var(--et-card);
+            border: 1px solid var(--et-border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 4px 16px rgba(31, 41, 51, .05);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .ig-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(31, 41, 51, .12); }
+        .ig-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--et-primary); }
+        .ig-card-body { padding: 20px 22px 14px 24px; flex: 1; }
+        .ig-cat { text-transform: uppercase; letter-spacing: .06em; font-size: .72rem; font-weight: 700; color: var(--et-primary); }
+        .ig-title { font-size: 1.22rem; font-weight: 700; margin: 6px 0 4px; line-height: 1.25; }
+        .ig-title a { color: var(--et-ink); text-decoration: none; }
+        .ig-title a:hover { color: var(--et-primary); }
+        .ig-id code { background: #f1f5f7; color: #3a4a55; padding: 2px 8px; border-radius: 6px; font-size: .82rem; }
+        .ig-badges { margin: 12px 0 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .pill { font-size: .74rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+        .pill-version { background: #e7f6ee; color: #1c7d49; }
+        .pill-date { background: #eef2f5; color: var(--et-muted); }
+        .pill-count { background: #fff6da; color: #8a6d00; }
+        .ig-desc { color: #46555f; font-size: .92rem; margin: 8px 0 0; min-height: 1.2em; }
+        .ig-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 22px 20px 24px; border-top: 1px solid var(--et-border); }
+        .btn-et {
+            font-size: .84rem; font-weight: 600; padding: 7px 14px; border-radius: 9px;
+            text-decoration: none; border: 1px solid var(--et-primary); transition: all .12s ease;
+        }
+        .btn-et.primary { background: var(--et-primary); color: #fff; }
+        .btn-et.primary:hover { background: var(--et-primary-dark); border-color: var(--et-primary-dark); }
+        .btn-et.ghost { background: #fff; color: var(--et-primary-dark); border-color: var(--et-border); }
+        .btn-et.ghost:hover { border-color: var(--et-primary); color: var(--et-primary); }
+
+        /* ── Artifacts table ── */
+        #artifacts-wrap { background: var(--et-card); border: 1px solid var(--et-border); border-radius: 16px; padding: 22px 24px; box-shadow: 0 4px 16px rgba(31,41,51,.05); }
+        #artifacts-wrap p { color: var(--et-muted); }
+        table.dataTable thead th { border-bottom: 2px solid var(--et-border); }
+        td.art-id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; }
+        .badge-type { background: #eef2f5; color: #3a4a55; font-size: .72rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+        .hidden { display: none; }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <header class="masthead">
+            <div class="masthead-top">
+                <a href="http://moh.gov.et"><img src="leftlogo.svg" alt="Ethiopia Ministry of Health" height="96" style="width:auto;" /></a>
+                <a href="http://moh.gov.et"><img src="rightlogo.png" alt="HL7 FHIR" height="74" style="width:auto;" /></a>
+            </div>
+            <h1>Ethiopia FHIR Implementation Guides</h1>
+            <p class="lead">Digital health standards published by the
+                <a href="http://moh.gov.et">Ethiopia Ministry of Health</a>.</p>
+            <div class="accent-rule"></div>
+        </header>
+
+        <nav class="tabbar">
+            <button id="tab-igs" class="active" data-target="panel-igs">Implementation Guides</button>
+            <button id="tab-artifacts" data-target="panel-artifacts">All Artifacts</button>
+        </nav>
+
+        <!-- IG list -->
+        <section id="panel-igs">
+            <p id="ig-status" class="status">Loading published Implementation Guides&hellip;</p>
+            <div id="ig-cards" class="ig-grid"></div>
+        </section>
+
+        <!-- Artifacts -->
+        <section id="panel-artifacts" class="hidden">
+            <div id="artifacts-wrap">
+                <p>Every artifact (profiles, value sets, code systems, examples&hellip;) published across all Implementation Guides.</p>
+                <table id="artifacts-table" class="display" style="width:100%">
+                    <thead>
+                        <tr><th>Id</th><th>Type</th><th>Name</th><th>Version</th><th>IG</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ─────────────────────────────────────────────────────────────────────
+        // Driven entirely by package-registry.json, which the IG publisher
+        // (go-publish) regenerates on every publication. Publish a new IG and it
+        // shows up here automatically — no igs.json or hand-edited list.
+        // ─────────────────────────────────────────────────────────────────────
+        const REGISTRY_URL = 'package-registry.json';
+
+        async function fetchJSON(url) {
+            const r = await fetch(url);
+            if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+            return r.json();
+        }
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function folderFromPath(p) {
+            if (!p) return null;
+            const t = p.replace(/^\/+/, '');
+            const i = t.lastIndexOf('/');
+            return i >= 0 ? t.substring(0, i) : t;
+        }
+        function githubUrl(ciBuild) {
+            if (!ciBuild) return null;
+            try {
+                const u = new URL(ciBuild);
+                const m = u.hostname.match(/^([^.]+)\.github\.io$/);
+                if (m) {
+                    const repo = u.pathname.replace(/^\/+/, '').split('/')[0];
+                    if (repo) return `https://github.com/${m[1]}/${repo}`;
+                }
+            } catch (e) { /* not parseable */ }
+            return ciBuild;
+        }
+        const asPackages = d => Array.isArray(d) ? d : (d.packages || []);
+
+        function cardHtml(pkg) {
+            const folder = folderFromPath(pkg.path);
+            const latest = pkg.latest || {};
+            const gh = githubUrl(pkg['ci-build']);
+            const versions = pkg['version-count'];
+            const igHref = folder ? `./${folder}/index.html` : (latest.path || '#');
+
+            const pills = [];
+            if (latest.version) pills.push(`<span class="pill pill-version">v${esc(latest.version)}</span>`);
+            if (latest.date) pills.push(`<span class="pill pill-date">${esc(latest.date)}</span>`);
+            if (versions) pills.push(`<span class="pill pill-count">${esc(versions)} version${versions == 1 ? '' : 's'}</span>`);
+
+            const btns = [`<a class="btn-et primary" href="${igHref}">Open IG</a>`];
+            if (folder) btns.push(`<a class="btn-et ghost" href="./${folder}/history.html">History</a>`);
+            if (gh) btns.push(`<a class="btn-et ghost" target="_blank" rel="noopener" href="${gh}">GitHub</a>`);
+            if (pkg.canonical) btns.push(`<a class="btn-et ghost" target="_blank" rel="noopener" href="${pkg.canonical}">Canonical</a>`);
+
+            return `
+              <article class="ig-card">
+                <div class="ig-card-body">
+                    ${pkg.category ? `<div class="ig-cat">${esc(pkg.category)}</div>` : ''}
+                    <h2 class="ig-title"><a href="${igHref}">${esc(pkg.title || pkg['package-id'])}</a></h2>
+                    <div class="ig-id"><code>${esc(pkg['package-id'] || '')}</code></div>
+                    <div class="ig-badges">${pills.join('')}</div>
+                    <p class="ig-desc" data-folder="${folder ? esc(folder) : ''}"></p>
+                </div>
+                <div class="ig-footer">${btns.join('')}</div>
+              </article>`;
+        }
+
+        // Non-blocking enrichment: human description from each IG's package-list.json
+        async function fillDescription(pkg) {
+            if (!pkg.path) return;
+            try {
+                const pl = await fetchJSON(pkg.path);
+                const desc = pl.introduction || pl.description;
+                if (!desc) return;
+                const el = document.querySelector(`#ig-cards .ig-desc[data-folder="${folderFromPath(pkg.path)}"]`);
+                if (el) el.textContent = desc;
+            } catch (e) { /* package-list.json not present yet */ }
+        }
+
+        async function loadPackageInfo() {
+            const status = document.getElementById('ig-status');
+            const cards = document.getElementById('ig-cards');
+            try {
+                const packages = asPackages(await fetchJSON(REGISTRY_URL));
+                if (!packages.length) { status.textContent = 'No Implementation Guides have been published yet.'; return; }
+                packages.sort((a, b) =>
+                    (a.category || '').localeCompare(b.category || '') ||
+                    (a.title || a['package-id'] || '').localeCompare(b.title || b['package-id'] || ''));
+                status.textContent = `${packages.length} published Implementation Guide${packages.length === 1 ? '' : 's'}`;
+                cards.innerHTML = packages.map(cardHtml).join('');
+                packages.forEach(fillDescription);
+            } catch (e) {
+                console.error('Error loading package-registry.json:', e);
+                status.textContent = 'Could not load package-registry.json.';
+                status.style.color = '#d4351c';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPackageInfo();
+
+            // Tabs
+            const buttons = document.querySelectorAll('.tabbar button');
+            buttons.forEach(btn => btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('panel-igs').classList.toggle('hidden', btn.dataset.target !== 'panel-igs');
+                document.getElementById('panel-artifacts').classList.toggle('hidden', btn.dataset.target !== 'panel-artifacts');
+                // DataTables needs a redraw when its container becomes visible
+                if (btn.dataset.target === 'panel-artifacts' && window._artTable) window._artTable.columns.adjust().draw(false);
+            }));
+
+            // Artifacts table — folders come from the registry (no igs.json)
+            const table = $('#artifacts-table').DataTable({
+                destroy: true, searching: true, pageLength: 25,
+                order: [[1, 'asc'], [2, 'asc']],
+                columns: [
+                    { data: 'id', className: 'art-id', render: (d, t, row) => row.url ? `<a href="${row.url}">${d}</a>` : d },
+                    { data: 'type', render: d => d ? `<span class="badge-type">${d}</span>` : '' },
+                    { data: 'name' },
+                    { data: 'version', defaultContent: '' },
+                    { data: 'ig', defaultContent: '' },
+                ],
+            });
+            window._artTable = table;
+
+            // The publisher writes canonicals.json into the version subfolder
+            // (e.g. core/0.9.0/canonicals.json), not the IG root. Try the latest
+            // version first, then a couple of fallbacks.
+            async function fetchCanonicals(folder, pkg) {
+                const urls = [];
+                const v = pkg.latest && pkg.latest.version;
+                if (v) urls.push(`${folder}/${v}/canonicals.json`);
+                urls.push(`${folder}/canonicals.json`);
+                for (const url of urls) {
+                    try { return await fetchJSON(url); } catch (e) { /* try next */ }
+                }
+                return null;
+            }
+
+            (async function loadArtifacts() {
+                try {
+                    const packages = asPackages(await fetchJSON(REGISTRY_URL));
+                    for (const pkg of packages) {
+                        const folder = folderFromPath(pkg.path);
+                        if (!folder) continue;
+                        const canonicals = await fetchCanonicals(folder, pkg);
+                        if (!canonicals) { console.warn(`No canonicals.json for ${folder}`); continue; }
+                        const igName = pkg.title || pkg['package-id'];
+                        table.rows.add(canonicals.map(c => Object.assign({ ig: igName }, c)));
+                    }
+                    table.draw();
+                } catch (e) { console.error('Error loading artifacts:', e); }
+            })();
+        });
+    </script>
+</body>
+</html>
